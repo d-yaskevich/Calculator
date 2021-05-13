@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -50,14 +51,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View v) { // v = Button - "*"
+
         // 1. 'Запоминание' операнда
-        String resultText = resultET.getText().toString();
+        String resultText = resultET.getText().toString(); // "36"
         operandTV.setText(resultText);
 
         // 2. 'Запоминание' операции
         Button btn = (Button) v;
-        String btnText = btn.getText().toString();
+        String btnText = btn.getText().toString(); // "*"
         operationTV.setText(btnText);
 
         // 3. Отчистка поля ввода
@@ -88,22 +90,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(TAG, "onClearClick");
     }
 
-    public void onNumberClick(View v) {
+    public void onNumberClick(View v) { // v = Button - "."
         Button btn = (Button) v;
-        String btnText = btn.getText().toString();
-        resultET.append(btnText);
+        String btnText = btn.getText().toString(); // "."
+
+        String resultStr = resultET.getText().toString(); // "1"
+        if (resultStr.equals("0")) {
+            resultET.setText(btnText);
+        } else if (btnText.equals(".") && resultStr.contains(".")) {
+            // nothing to do
+        } else {
+            resultET.append(btnText);
+        }
+
+//        int size = resultStr.length();
+//        String subStr = resultStr.substring(0, size - 1);
 
         Log.d(TAG, "onNumberClick");
     }
 
     public void onEqualsClick(View v) {
         // 1. 'Запоминание' оператора
-        String resultText = resultET.getText().toString();
+        String resultText = resultET.getText().toString(); // "584"
         operatorTV.setText(resultText);
 
         // 2. Отображение результата
-        double result = calculate();
-        String resText = String.valueOf(result);
+        double result = calculate(); // 237.47
+        String resText = String.valueOf(result); // "237.47"
         resultET.setText(resText);
 
         Log.d(TAG, "onEqualsClick");
@@ -111,16 +124,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private double calculate() {
         // 1.  Получение первого числа и преобразование String -> double
-        String operandText = operandTV.getText().toString();
-        double firstNumber = Double.parseDouble(operandText);
+        String operandText = operandTV.getText().toString(); // "36.65"
+        double firstNumber = parseDouble(operandText); // 36.65
 
         // 2.  Получение второго числа и преобразование String -> double
         String operatorText = operatorTV.getText().toString();
-        double secondNumber = Double.parseDouble(operatorText);
+        double secondNumber = parseDouble(operatorText);
 
         // 3.  Вычисление результата в зависимости от оператора
-        String operation = operationTV.getText().toString();
-        switch (operation) {
+        String operation = operationTV.getText().toString(); // "*"
+        switch (operation) { // "*"
             case ADDITION:
                 return firstNumber + secondNumber;
             case SUBTRACTION:
@@ -132,6 +145,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 return 0;
         }
+    }
+
+    private double parseDouble(String text) {
+        try {
+            return Double.parseDouble(text);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+//        catch (Exception e) {
+//            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+//        } finally {
+//        }
+        return 0;
     }
 
     @Override
